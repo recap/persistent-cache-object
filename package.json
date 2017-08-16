@@ -1,0 +1,17 @@
+{
+  "name": "persistent-object",
+  "version": "0.1.0",
+  "description": "Simple JSON persistent object to file",
+  "main": "",
+  "dependencies": {
+    "assert": "^1.4.1",
+    "js-md5": "^0.6.0",
+    "json-stable-stringify": "^1.0.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "node test/basic.js"
+  },
+  "author": "Reggie Cushing",
+  "license": "ISC"
+}
