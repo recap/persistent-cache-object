@@ -1,8 +1,8 @@
 {
-  "name": "persistent-object",
+  "name": "persistent-cache-object",
   "version": "0.1.0",
   "description": "Simple JSON persistent object to file",
-  "main": "",
+  "main": "index.js",
   "dependencies": {
     "assert": "^1.4.1",
     "js-md5": "^0.6.0",
@@ -13,5 +13,22 @@
     "test": "node test/basic.js"
   },
   "author": "Reggie Cushing",
-  "license": "ISC"
+  "license": "MIT",
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/recap/persistent-cache-object.git"
+  },
+  "keywords": [
+    "persistent",
+    "object",
+    "JSON",
+    "file"
+  ],
+  "bugs": {
+    "url": "https://github.com/recap/persistent-cache-object/issues"
+  },
+  "homepage": "https://github.com/recap/persistent-cache-object#readme"
 }

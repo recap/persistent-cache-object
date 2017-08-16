@@ -1,4 +1,4 @@
-const PersistentObject = require('../src/persistent-object');
+const PersistentObject = require('../src/persistent-cache-object');
 const fs = require('fs');
 const assert = require('assert');
 
