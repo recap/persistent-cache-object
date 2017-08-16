@@ -36,6 +36,7 @@ map.setInterval(-1);
 Initialize persistent object with and existing object.
 
 ``` js 
+const PersistentObject = require('persistent-object');
 const map = new PersistentObject('./map.db', {'key':'value'});
 ```
 
