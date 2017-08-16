@@ -2,7 +2,7 @@
   "name": "persistent-cache-object",
   "version": "0.1.0",
   "description": "Simple JSON persistent object to file",
-  "main": "src/persistent-cache-objec.js",
+  "main": "src/persistent-cache-object.js",
   "dependencies": {
     "assert": "^1.4.1",
     "js-md5": "^0.6.0",
