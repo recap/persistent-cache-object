@@ -31,10 +31,10 @@ var PersistObject = function(file, object, options, cb) {
 		if (hash !== currentHash) {
 			hash = currentHash;
 			save(cb);
-		} else if(cb) {
+		} else if (cb) {
 			cb(null, true);
-		}	
-		
+		}
+
 	}
 
 	function close(cb) {
@@ -49,7 +49,8 @@ var PersistObject = function(file, object, options, cb) {
 
 	try {
 		const objectFromFile = fs.readFileSync(file, 'utf-8');
-		object = new PersistObject(JSON.parse(objectFromFile));
+		const loadedObject = objectFromFile ? JSON.parse(objectFromFile) : {};
+		object = new PersistObject(loadedObject);
 	} catch (e) {
 		if (e.code === "ENOENT") {
 			object = new PersistObject(object || {});
@@ -61,12 +62,24 @@ var PersistObject = function(file, object, options, cb) {
 
 	PersistObject.prototype.close = close;
 	PersistObject.prototype.flush = flush;
+	PersistObject.prototype.setInterval = function(intervalStep) {
+		if (intervalStep === -1) {
+			clearInterval(interval);
+		}
+		if (!isNaN(intervalStep)) {
+			clearInterval(interval);
+			interval = setInterval(() => {
+				flush();
+			}, intervalStep);
+		}
+	}
 
-	const intervalTime = (options && options.interval) ? options.interval : 5000;
+
+	let intervalTime = (options && options.interval) ? options.interval : 5000;
 	const noInterval = (options && options.disableInterval)
 	let hash = md5(stringify(object));
 
-	const interval = (!noInterval) ? (setInterval(() => {
+	let interval = (!noInterval) ? (setInterval(() => {
 		flush();
 	}, intervalTime)) : null;
 
