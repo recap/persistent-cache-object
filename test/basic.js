@@ -6,8 +6,6 @@ const map = new PersistentObject('./map.db');
 
 map['hello'] = 'world';
 
-map.setInterval(10000);
-map.flush();
 map.close((err)=>{
 	const reloadMap = new PersistentObject('./map.db');
 	reloadMap['key2'] = 'value2';
