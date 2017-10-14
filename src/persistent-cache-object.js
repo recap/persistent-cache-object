@@ -1,3 +1,4 @@
+"use strict";
 const fs = require('fs');
 const md5 = require('js-md5');
 const stringify = require('json-stable-stringify');
@@ -62,7 +63,6 @@ var PersistObject = function(file, object, options, cb) {
 
 	if (!file) {
 		throw Error("no file given!");
-		return null;
 	}
 
 	try {
@@ -92,11 +92,11 @@ var PersistObject = function(file, object, options, cb) {
 				flush();
 			}, intervalStep);
 		}
-	}
+	};
 
 
 	let intervalTime = (options && options.interval) ? options.interval : 5000;
-	const noInterval = (options && options.disableInterval)
+	const noInterval = (options && options.disableInterval);
 	let hash = md5(stringify(object));
 
 	let interval = (!noInterval) ? (setInterval(() => {
@@ -104,6 +104,6 @@ var PersistObject = function(file, object, options, cb) {
 	}, intervalTime)) : null;
 
 	return object;
-}
+};
 
 module.exports = PersistObject;
