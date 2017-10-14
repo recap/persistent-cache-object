@@ -16,14 +16,32 @@ var PersistObject = function(file, object, options, cb) {
 		}
 	}
 
+	function clear(cb) {
+		object = {};
+		flush(cb);
+	}
+
+	function set(data, cb) {
+		object = data;
+		flush(cb);
+	}
+
 	function save(cb) {
 		const data = stringify(object);
-		fs.writeFile(file, data, (err) => {
-			if (err && !cb) throw err;
-			if (err && cb) cb(err, null);
-			if (cb) cb(null, true);
+		try {
+			fs.writeFileSync(file, data);
+			if (cb) {
+				cb(null, true);
+			}
 			return;
-		});
+		} catch (error) {
+			if (cb) {
+				cb(error, null);
+			} else {
+				throw error;
+			}
+			return;
+		}
 	}
 
 	function flush(cb) {
@@ -62,6 +80,8 @@ var PersistObject = function(file, object, options, cb) {
 
 	PersistObject.prototype.close = close;
 	PersistObject.prototype.flush = flush;
+	PersistObject.prototype.clear = clear;
+	PersistObject.prototype.set = set;
 	PersistObject.prototype.setInterval = function(intervalStep) {
 		if (intervalStep === -1) {
 			clearInterval(interval);
