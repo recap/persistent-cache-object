@@ -1,6 +1,7 @@
 "use strict";
 const fs = require('fs');
 const md5 = require('js-md5');
+const _ = require('underscore');
 const stringify = require('json-stable-stringify');
 
 
@@ -25,6 +26,26 @@ var PersistObject = function(file, object, options, cb) {
 	function set(data, cb) {
 		object = data;
 		flush(cb);
+	}
+
+	function lock(cb) {
+		const lockFile = file + '.lock';
+		const l = setInterval(() => {
+			l._repeat = 500;
+			fs.open(lockFile, 'wx', (err, fd) => {
+				if (!err) {
+					clearInterval(l);
+					cb(null, true);
+				}
+			});
+		}, 0);
+	}
+
+	function unlock(cb) {
+		const lockFile = file + '.lock';
+		fs.unlink(lockFile, (err) => {
+			//whatever
+		});
 	}
 
 	function save(cb) {
@@ -61,20 +82,49 @@ var PersistObject = function(file, object, options, cb) {
 		flush(cb);
 	}
 
+	function reload(cb) {
+		const objectFromFile = fs.readFileSync(file, 'utf-8');
+		const savedObject = JSON.parse(objectFromFile);
+		
+		if (savedObject) {
+			const savedKeys = Object.keys(savedObject);
+			const thisObjectKeys = Object.keys(object);
+			const diff = _.difference(thisObjectKeys, savedKeys);
+			diff.forEach((key) => {
+				delete object[key];
+			});
+			savedKeys.forEach((key) => {
+				object[key] = savedObject[key];
+			});
+		}
+
+		if (cb) {
+			cb(null, true);
+		}
+	}
+
 	if (!file) {
 		throw Error("no file given!");
 	}
 
-	try {
-		const objectFromFile = fs.readFileSync(file, 'utf-8');
-		const loadedObject = objectFromFile ? JSON.parse(objectFromFile) : {};
-		object = new PersistObject(loadedObject);
-	} catch (e) {
-		if (e.code === "ENOENT") {
-			object = new PersistObject(object || {});
-			save();
-		} else {
-			throw e;
+	let tries = 0;
+	while(tries <= 5) {
+		try {
+			tries++;
+			const objectFromFile = fs.readFileSync(file, 'utf-8');
+			const loadedObject = objectFromFile ? JSON.parse(objectFromFile) : {};
+			object = new PersistObject(loadedObject);
+			break;
+		} catch (e) {
+			if (e.code === "ENOENT") {
+				object = new PersistObject(object || {});
+				save();
+				break;
+			} else {
+				if (tries > 5) {
+					throw e;
+				}
+			}
 		}
 	}
 
@@ -82,6 +132,10 @@ var PersistObject = function(file, object, options, cb) {
 	PersistObject.prototype.flush = flush;
 	PersistObject.prototype.clear = clear;
 	PersistObject.prototype.set = set;
+	PersistObject.prototype.lock = lock;
+	PersistObject.prototype.unlock = unlock;
+	PersistObject.prototype.reload = reload;
+
 	PersistObject.prototype.setInterval = function(intervalStep) {
 		if (intervalStep === -1) {
 			clearInterval(interval);
