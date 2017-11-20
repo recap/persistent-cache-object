@@ -39,4 +39,18 @@ Initialize persistent object with and existing object.
 const PersistentObject = require('persistent-cache-object');
 const map = new PersistentObject('./map.db', {'key':'value'});
 ```
+## example 5
+Using locks to allow multiple node processes access the same object. 
+N.B to be used with caution.
 
+```js
+const PersistentObject = require('../src/persistent-cache-object');
+const map = new PersistentObject('./map.db', null, {'disableInterval': true});
+
+map.lock(() => {
+	map.reload();
+	map['aKey'] = 'aValue';
+	map.flush();
+	map.unlock();
+});
+```
