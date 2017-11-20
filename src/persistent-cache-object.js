@@ -28,13 +28,20 @@ var PersistObject = function(file, object, options, cb) {
 		flush(cb);
 	}
 
-	function lock(cb) {
+	function lock() {
+		const cb = arguments[arguments.length - 1];
+		const timeout = (arguments.length > 1) ? arguments[0] : undefined;
 		const lockFile = file + '.lock';
 		const l = setInterval(() => {
 			l._repeat = 500;
 			fs.open(lockFile, 'wx', (err, fd) => {
 				if (!err) {
 					clearInterval(l);
+					if (timeout) {
+						setTimeout(() => {
+							unlock();
+						}, timeout);
+					}
 					cb(null, true);
 				}
 			});
