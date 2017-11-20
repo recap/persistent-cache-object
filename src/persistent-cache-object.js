@@ -18,6 +18,8 @@ var PersistObject = function(file, object, options, cb) {
 		}
 	}
 
+	let __lockTimeout = null;
+
 	function clear(cb) {
 		object = {};
 		flush(cb);
@@ -38,7 +40,7 @@ var PersistObject = function(file, object, options, cb) {
 				if (!err) {
 					clearInterval(l);
 					if (timeout) {
-						setTimeout(() => {
+						__lockTimeout = setTimeout(() => {
 							unlock();
 						}, timeout);
 					}
@@ -49,6 +51,9 @@ var PersistObject = function(file, object, options, cb) {
 	}
 
 	function unlock(cb) {
+		if (__lockTimeout) {
+			clearTimeout(__lockTimeout);
+		}
 		const lockFile = file + '.lock';
 		fs.unlink(lockFile, (err) => {
 			//whatever
