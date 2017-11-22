@@ -2,7 +2,7 @@
 
 rm map.db 2>/dev/null
 
-ITERATIONS=50
+ITERATIONS=100
 
 echo "launching $ITERATIONS processes";
 

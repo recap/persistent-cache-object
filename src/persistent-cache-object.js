@@ -34,6 +34,23 @@ var PersistObject = function(file, object, options, cb) {
 		const cb = arguments[arguments.length - 1];
 		const timeout = (arguments.length > 1) ? arguments[0] : undefined;
 		const lockFile = file + '.lock';
+		let stat = null;
+		try {
+			stat = fs.statSync(lockFile);
+		} catch (err) {
+			if (!err.errno === 'ENOENT') {
+				throw err;
+			}
+		}
+		if (stat && stat.ctime && timeout) {
+			const t1 = new Date().getTime();
+			const t2 = new Date(stat.ctime).getTime();
+			const diff = t1 - t2;
+			const d = timeout + timeout * 0.1;
+			if ((t1 - t2) > (timeout + timeout * 0.1)) {
+				unlock();
+			}
+		}
 		const l = setInterval(() => {
 			l._repeat = 500;
 			fs.open(lockFile, 'wx', (err, fd) => {
@@ -47,7 +64,7 @@ var PersistObject = function(file, object, options, cb) {
 					cb(null, true);
 				}
 			});
-		}, 0);
+		}, Math.floor(Math.random() * 100));
 	}
 
 	function unlock(cb) {
